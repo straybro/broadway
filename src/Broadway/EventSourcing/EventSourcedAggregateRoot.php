@@ -16,6 +16,7 @@ use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainEventStreamInterface;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
+use Broadway\Snapshot\Snapshot;
 
 /**
  * Convenience base class for event sourced aggregate roots.
@@ -61,8 +62,13 @@ abstract class EventSourcedAggregateRoot implements AggregateRootInterface
     /**
      * Initializes the aggregate using the given "history" of events.
      */
-    public function initializeState(DomainEventStreamInterface $stream)
+    public function initializeState(DomainEventStreamInterface $stream, Snapshot $snapshot = null)
     {
+        if ($snapshot !== null) {
+            $this->playhead = $snapshot->getPlayhead();
+            $this->handleRecursively($snapshot->getPayload());
+        }
+        
         foreach ($stream as $message) {
             $this->playhead++;
             $this->handleRecursively($message->getPayload());

@@ -18,6 +18,7 @@ use Broadway\EventHandling\EventBusInterface;
 use Broadway\EventSourcing\AggregateFactory\AggregateFactoryInterface;
 use Broadway\EventStore\EventStoreInterface;
 use Broadway\EventStore\EventStreamNotFoundException;
+use Broadway\SnapshotStore\SnapshotStoreInterface;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
 
@@ -34,11 +35,13 @@ class EventSourcingRepository implements RepositoryInterface
     private $snapshotStore;
 
     /**
-     * @param EventStoreInterface             $eventStore
-     * @param EventBusInterface               $eventBus
-     * @param string                          $aggregateClass
-     * @param AggregateFactoryInterface       $aggregateFactory
-     * @param EventStreamDecoratorInterface[] $eventStreamDecorators
+     * EventSourcingRepository constructor.
+     * @param EventStoreInterface $eventStore
+     * @param EventBusInterface $eventBus
+     * @param $aggregateClass
+     * @param AggregateFactoryInterface $aggregateFactory
+     * @param array $eventStreamDecorators
+     * @param SnapshotStoreInterface $snapshotStore
      */
     public function __construct(
         EventStoreInterface $eventStore,
@@ -46,7 +49,7 @@ class EventSourcingRepository implements RepositoryInterface
         $aggregateClass,
         AggregateFactoryInterface $aggregateFactory,
         array $eventStreamDecorators = array(),
-        $snapshotStore
+        SnapshotStoreInterface $snapshotStore
     ) {
         $this->assertExtendsEventSourcedAggregateRoot($aggregateClass);
 
@@ -55,7 +58,7 @@ class EventSourcingRepository implements RepositoryInterface
         $this->aggregateClass        = $aggregateClass;
         $this->aggregateFactory      = $aggregateFactory;
         $this->eventStreamDecorators = $eventStreamDecorators;
-        $this->snapshotStore = $snapshotStore;
+        $this->snapshotStore         = $snapshotStore;
     }
 
     /**

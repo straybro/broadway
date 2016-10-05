@@ -3,7 +3,8 @@
 namespace Broadway\EventSourcing\AggregateFactory;
 
 use Broadway\Domain\DomainEventStreamInterface;
-use Broadway\Snapshot\SnapshotInterface;
+use Broadway\Snapshot\SnapshotMessage;
+use Broadway\Snapshot\SnapshotMessageInterface;
 
 /**
  * Creates aggregates by instantiating the aggregateClass and then
@@ -15,10 +16,10 @@ class PublicConstructorAggregateFactory implements AggregateFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function create($aggregateClass, DomainEventStreamInterface $domainEventStream, SnapshotInterface $snapshot = null)
+    public function create($aggregateClass, DomainEventStreamInterface $domainEventStream, SnapshotMessage $snapshotMessage = null)
     {
         $aggregate = new $aggregateClass();
-        $aggregate->initializeState($domainEventStream);
+        $aggregate->initializeState($domainEventStream, $snapshotMessage);
 
         return $aggregate;
     }

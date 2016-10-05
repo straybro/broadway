@@ -11,15 +11,16 @@
 
 namespace Broadway\SnapshotStore;
 
-use Broadway\Snapshot\SnapshotInterface;
+
+use Broadway\Snapshot\SnapshotMessage;
 
 interface SnapshotStoreInterface
 {
     /**
      * @param $aggregateId
-     * @return SnapshotInterface
+     * @return SnapshotMessage
      */
     public function loadLast($aggregateId);
 
-    public function append($aggregateId, SnapshotInterface $snapshot);
+    public function append($aggregateId, SnapshotMessage $snapshotMessage);
 }

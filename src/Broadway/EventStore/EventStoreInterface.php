@@ -23,7 +23,7 @@ interface EventStoreInterface
      *
      * @return DomainEventStreamInterface
      */
-    public function load($id, $playhead);
+    public function load($id, $playhead = 0);
 
     /**
      * @param mixed                      $id

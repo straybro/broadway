@@ -72,7 +72,7 @@ class DBALEventStore implements EventStoreInterface, EventStoreManagementInterfa
     /**
      * {@inheritDoc}
      */
-    public function load($id)
+    public function load($id, $playhead = 0)
     {
         $statement = $this->prepareLoadStatement();
         $statement->bindValue(1, $this->convertIdentifierToStorageValue($id));

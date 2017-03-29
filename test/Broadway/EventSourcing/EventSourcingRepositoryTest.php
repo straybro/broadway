@@ -18,12 +18,24 @@ use Broadway\EventHandling\TraceableEventBus;
 use Broadway\EventSourcing\AggregateFactory\NamedConstructorAggregateFactory;
 use Broadway\EventSourcing\AggregateFactory\PublicConstructorAggregateFactory;
 use Broadway\EventStore\TraceableEventStore;
+use Broadway\SnapshotStore\SnapshotStoreInterface;
 
 class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
 {
-    protected function createEventSourcingRepository(TraceableEventStore $eventStore, TraceableEventBus $eventBus, array $eventStreamDecorators)
+    protected function createEventSourcingRepository(
+        TraceableEventStore $eventStore,
+        TraceableEventBus $eventBus,
+        array $eventStreamDecorators,
+        SnapshotStoreInterface $snapshotStore)
     {
-        return new EventSourcingRepository($eventStore, $eventBus, '\Broadway\EventSourcing\TestEventSourcedAggregate', new PublicConstructorAggregateFactory(), $eventStreamDecorators);
+        return new EventSourcingRepository(
+            $eventStore,
+            $eventBus,
+            '\Broadway\EventSourcing\TestEventSourcedAggregate',
+            new PublicConstructorAggregateFactory(),
+            $eventStreamDecorators,
+            $snapshotStore
+            );
     }
 
     protected function createAggregate()
@@ -37,7 +49,14 @@ class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
      */
     public function it_throws_an_exception_when_instantiated_with_a_class_that_is_not_an_EventSourcedAggregateRoot()
     {
-        new EventSourcingRepository($this->eventStore, $this->eventBus, 'stdClass', new PublicConstructorAggregateFactory());
+        new EventSourcingRepository(
+            $this->eventStore,
+            $this->eventBus,
+            'stdClass',
+            new PublicConstructorAggregateFactory(),
+            array(),
+            $this->snapshotStore
+        );
     }
 
     /**
@@ -91,7 +110,8 @@ class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
             $this->eventBus,
             '\Broadway\EventSourcing\TestEventSourcedAggregateWithStaticConstructor',
             $staticFactory,
-            array()
+            array(),
+            $this->snapshotStore
         );
     }
 }

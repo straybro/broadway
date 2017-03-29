@@ -28,7 +28,7 @@ class InMemoryEventStore implements EventStoreInterface, EventStoreManagementInt
     /**
      * {@inheritDoc}
      */
-    public function load($id)
+    public function load($id, $playhead = 0)
     {
         $id = (string) $id;
 

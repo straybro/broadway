@@ -242,7 +242,14 @@ class JobSeekerRepository extends Broadway\EventSourcing\EventSourcingRepository
 {
     public function __construct(Broadway\EventStore\EventStore $eventStore, Broadway\EventHandling\EventBus $eventBus)
     {
-        parent::__construct($eventStore, $eventBus, 'JobSeeker', new Broadway\EventSourcing\AggregateFactory\PublicConstructorAggregateFactory());
+        parent::__construct(
+            $eventStore,
+            $eventBus,
+            'JobSeeker',
+            new Broadway\EventSourcing\AggregateFactory\PublicConstructorAggregateFactory(),
+            [],
+            new Broadway\SnapshotStore\InMemorySnapshotStore()
+        );
     }
 }
 

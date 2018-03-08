@@ -32,15 +32,16 @@ final class DateTime
     }
 
     /**
+     * @param DateTimeZone|null $timeZone
      * @return DateTime
      */
-    public static function now(): self
+    public static function now(DateTimeZone $timeZone = null): self
     {
         return new self(
             DateTimeImmutable::createFromFormat(
                 'U.u',
                 sprintf('%.6F', microtime(true)),
-                new DateTimeZone('UTC')
+                ($timeZone ? : new DateTimeZone('UTC'))
             )
         );
     }
@@ -116,11 +117,15 @@ final class DateTime
     }
 
     /**
+     * @param DateTimeZone|null $timeZone
      * @return DateTime
      */
-    public function toBeginningOfWeek(): self
+    public function toBeginningOfWeek(DateTimeZone $timeZone = null)
     {
-        return new self(new DateTimeImmutable($this->dateTime->format('o-\WW-1'), new DateTimeZone('UTC')));
+        return new DateTime(new DateTimeImmutable(
+            $this->dateTime->format('o-\WW-1'),
+            ($timeZone ? : new DateTimeZone('UTC'))
+        ));
     }
 
     /**

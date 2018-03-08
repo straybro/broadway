@@ -107,7 +107,14 @@ class InvitationRepository extends Broadway\EventSourcing\EventSourcingRepositor
 {
     public function __construct(Broadway\EventStore\EventStore $eventStore, Broadway\EventHandling\EventBus $eventBus)
     {
-        parent::__construct($eventStore, $eventBus, 'Invitation', new Broadway\EventSourcing\AggregateFactory\PublicConstructorAggregateFactory());
+        parent::__construct(
+            $eventStore,
+            $eventBus,
+            'Invitation',
+            new Broadway\EventSourcing\AggregateFactory\PublicConstructorAggregateFactory(),
+            [],
+            new Broadway\SnapshotStore\InMemorySnapshotStore()
+        );
     }
 }
 

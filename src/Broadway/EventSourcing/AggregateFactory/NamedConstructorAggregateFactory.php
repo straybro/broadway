@@ -7,6 +7,7 @@ namespace Broadway\EventSourcing\AggregateFactory;
 use Assert\Assertion as Assert;
 use Broadway\Domain\DomainEventStream;
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
+use Broadway\Snapshot\SnapshotMessage;
 
 /**
  * Creates aggregates by passing a DomainEventStream to the given public static method
@@ -28,7 +29,7 @@ final class NamedConstructorAggregateFactory implements AggregateFactory
     /**
      * {@inheritdoc}
      */
-    public function create(string $aggregateClass, DomainEventStream $domainEventStream): EventSourcedAggregateRoot
+    public function create(string $aggregateClass, DomainEventStream $domainEventStream, SnapshotMessage $snapshotMessage = null): EventSourcedAggregateRoot
     {
         $methodCall = sprintf('%s::%s', $aggregateClass, $this->staticConstructorMethod);
 

@@ -21,12 +21,24 @@ use Broadway\EventHandling\TraceableEventBus;
 use Broadway\EventSourcing\AggregateFactory\NamedConstructorAggregateFactory;
 use Broadway\EventSourcing\AggregateFactory\PublicConstructorAggregateFactory;
 use Broadway\EventStore\TraceableEventStore;
+use Broadway\SnapshotStore\SnapshotStoreInterface;
 
 class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
 {
-    protected function createEventSourcingRepository(TraceableEventStore $eventStore, TraceableEventBus $eventBus, array $eventStreamDecorators)
+    protected function createEventSourcingRepository(
+        TraceableEventStore $eventStore,
+        TraceableEventBus $eventBus,
+        array $eventStreamDecorators,
+        SnapshotStoreInterface $snapshotStore)
     {
-        return new EventSourcingRepository($eventStore, $eventBus, '\Broadway\EventSourcing\TestEventSourcedAggregate', new PublicConstructorAggregateFactory(), $eventStreamDecorators);
+        return new EventSourcingRepository(
+            $eventStore,
+            $eventBus,
+            '\Broadway\EventSourcing\TestEventSourcedAggregate',
+            new PublicConstructorAggregateFactory(),
+            $eventStreamDecorators,
+            $snapshotStore
+            );
     }
 
     protected function createAggregate()
@@ -41,7 +53,14 @@ class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new EventSourcingRepository($this->eventStore, $this->eventBus, 'stdClass', new PublicConstructorAggregateFactory());
+        new EventSourcingRepository(
+            $this->eventStore,
+            $this->eventBus,
+            'stdClass',
+            new PublicConstructorAggregateFactory(),
+            [],
+            $this->snapshotStore
+        );
     }
 
     /**
@@ -96,7 +115,8 @@ class EventSourcingRepositoryTest extends AbstractEventSourcingRepositoryTest
             $this->eventBus,
             '\Broadway\EventSourcing\TestEventSourcedAggregateWithStaticConstructor',
             $staticFactory,
-            []
+            [],
+            $this->snapshotStore
         );
     }
 }

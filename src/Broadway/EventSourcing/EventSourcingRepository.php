@@ -20,6 +20,7 @@ use Broadway\EventHandling\EventBus;
 use Broadway\EventSourcing\AggregateFactory\AggregateFactory;
 use Broadway\EventStore\EventStore;
 use Broadway\EventStore\EventStreamNotFoundException;
+use Broadway\SnapshotStore\SnapshotStoreInterface;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\Repository;
 
@@ -33,20 +34,23 @@ class EventSourcingRepository implements Repository
     private $aggregateClass;
     private $eventStreamDecorators = [];
     private $aggregateFactory;
+    private $snapshotStore;
 
     /**
-     * @param EventStore             $eventStore
-     * @param EventBus               $eventBus
-     * @param string                 $aggregateClass
-     * @param AggregateFactory       $aggregateFactory
+     * @param EventStore $eventStore
+     * @param EventBus $eventBus
+     * @param string $aggregateClass
+     * @param AggregateFactory $aggregateFactory
      * @param EventStreamDecorator[] $eventStreamDecorators
+     * @param SnapshotStoreInterface $snapshotStore
      */
     public function __construct(
         EventStore $eventStore,
         EventBus $eventBus,
         string $aggregateClass,
         AggregateFactory $aggregateFactory,
-        array $eventStreamDecorators = []
+        array $eventStreamDecorators = [],
+        SnapshotStoreInterface $snapshotStore
     ) {
         $this->assertExtendsEventSourcedAggregateRoot($aggregateClass);
 
@@ -55,6 +59,7 @@ class EventSourcingRepository implements Repository
         $this->aggregateClass = $aggregateClass;
         $this->aggregateFactory = $aggregateFactory;
         $this->eventStreamDecorators = $eventStreamDecorators;
+        $this->snapshotStore         = $snapshotStore;
     }
 
     /**
@@ -62,10 +67,16 @@ class EventSourcingRepository implements Repository
      */
     public function load($id): AggregateRoot
     {
+        $playhead = -1;
+        $snapshot = null;
         try {
-            $domainEventStream = $this->eventStore->load($id);
+            $snapshot = $this->snapshotStore->loadLast($id);
+            if ($snapshot !== null) {
+                $playhead = $snapshot->getPlayhead();
+            }
+            $domainEventStream = $this->eventStore->load($id, $playhead +1);
 
-            return $this->aggregateFactory->create($this->aggregateClass, $domainEventStream);
+            return $this->aggregateFactory->create($this->aggregateClass, $domainEventStream, $snapshot);
         } catch (EventStreamNotFoundException $e) {
             throw AggregateNotFoundException::create($id, $e);
         }

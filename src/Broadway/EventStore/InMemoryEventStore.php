@@ -31,7 +31,7 @@ final class InMemoryEventStore implements EventStore, EventStoreManagement
     /**
      * {@inheritdoc}
      */
-    public function load($id): DomainEventStream
+    public function load($id, $playhead = 0): DomainEventStream
     {
         $id = (string) $id;
 

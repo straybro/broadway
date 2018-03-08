@@ -28,6 +28,8 @@ use Broadway\EventStore\InMemoryEventStore;
 use Broadway\EventStore\TraceableEventStore;
 use Broadway\ReadModel\Projector;
 use Broadway\Repository\AggregateNotFoundException;
+use Broadway\SnapshotStore\InMemorySnapshotStore;
+use Broadway\SnapshotStore\SnapshotStoreInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -45,6 +47,9 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
     /** @var EventSourcingRepository */
     protected $repository;
 
+    /** @var SnapshotStoreInterface */
+    protected $snapshotStore;
+
     protected function setUp()
     {
         $this->eventStore = new TraceableEventStore(new InMemoryEventStore());
@@ -56,7 +61,15 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
         $this->eventStreamDecorator = new TraceableEventStoreDecorator();
         $this->eventStreamDecorator->trace();
 
-        $this->repository = $this->createEventSourcingRepository($this->eventStore, $this->eventBus, [$this->eventStreamDecorator]);
+
+        $this->snapshotStore = new InMemorySnapshotStore();
+
+        $this->repository = $this->createEventSourcingRepository(
+            $this->eventStore,
+            $this->eventBus,
+            array($this->eventStreamDecorator),
+            $this->snapshotStore
+        );
     }
 
     /**
@@ -171,7 +184,8 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
             $this->eventBus,
             get_class($this->createAggregate()),
             new PublicConstructorAggregateFactory(),
-            [new MetadataEnrichingEventStreamDecorator([new TestDecorationMetadataEnricher()])]
+            [new MetadataEnrichingEventStreamDecorator([new TestDecorationMetadataEnricher()])],
+            $this->snapshotStore
         );
 
         $aggregate = $this->createAggregate();
@@ -188,7 +202,11 @@ abstract class AbstractEventSourcingRepositoryTest extends TestCase
     /**
      * @return EventSourcingRepository
      */
-    abstract protected function createEventSourcingRepository(TraceableEventStore $eventStore, TraceableEventBus $eventBus, array $eventStreamDecorators);
+    abstract protected function createEventSourcingRepository(
+        TraceableEventStore $eventStore,
+        TraceableEventBus $eventBus,
+        array $eventStreamDecorators,
+        SnapshotStoreInterface $snapshotStore);
 
     /**
      * @return EventSourcedAggregateRoot

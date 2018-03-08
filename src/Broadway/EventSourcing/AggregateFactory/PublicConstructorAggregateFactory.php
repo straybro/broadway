@@ -6,6 +6,7 @@ namespace Broadway\EventSourcing\AggregateFactory;
 
 use Broadway\Domain\DomainEventStream;
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
+use Broadway\Snapshot\SnapshotMessage;
 
 /**
  * Creates aggregates by instantiating the aggregateClass and then
@@ -17,10 +18,10 @@ final class PublicConstructorAggregateFactory implements AggregateFactory
     /**
      * {@inheritdoc}
      */
-    public function create(string $aggregateClass, DomainEventStream $domainEventStream): EventSourcedAggregateRoot
+    public function create(string $aggregateClass, DomainEventStream $domainEventStream, SnapshotMessage $snapshotMessage = null): EventSourcedAggregateRoot
     {
         $aggregate = new $aggregateClass();
-        $aggregate->initializeState($domainEventStream);
+        $aggregate->initializeState($domainEventStream, $snapshotMessage);
 
         return $aggregate;
     }

@@ -7,7 +7,8 @@
         "beberlei/assert": "~2.0",
         "broadway/uuid-generator": "~0.1.0",
         "php": ">=5.5.9",
-        "ramsey/uuid": "~2.4"
+        "mattketmo/uuid-2x-bridge": "*@dev",
+        "ramsey/uuid": "^3.0"
     },
     "authors": [
       {
@@ -42,7 +43,8 @@
         "instaclick/base-test-bundle": "~0.5",
         "monolog/monolog": "~1.8",
         "symfony/console": "~2.4",
-        "symfony/proxy-manager-bridge": "~2.4"
+        "symfony/proxy-manager-bridge": "~2.4",
+        "phpunit/phpunit": "^5"
     },
     "suggest": {
         "doctrine/dbal": "For the BroadwayBundle (to persist events)",
